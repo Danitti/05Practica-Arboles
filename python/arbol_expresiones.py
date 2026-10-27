@@ -101,8 +101,6 @@ class ArbolExpresion:
         elif operador == "*":
             return operando1 * operando2
         elif operador == "/":
-            if (operando2 == 0):
-                raise ZeroDivisionError
             return operando1 / operando2
 
     # --- Ejercicio 2: evaluar -----------------------------------------------
@@ -146,7 +144,7 @@ class ArbolExpresion:
         
 
     def postfija(self):
-        # Coste: O(?)      (3 + 4) * 2  ->  "3 4 + 2 *"
+        # Coste: O(n)      (3 + 4) * 2  ->  "3 4 + 2 *"
         lista_nodos = []
         self._postfija(self.raiz, lista_nodos)
         
@@ -164,19 +162,20 @@ class ArbolExpresion:
     def infija(self):
         # Coste: O(n)      (3 + 4) * 2  ->  "((3 + 4) * 2)"
         # Cada operacion entre parentesis; una hoja sola, sin ellos: "7"
-        lista_nodos = []
-        self._infija(self.raiz, lista_nodos)
+        cadena_resultado = "("
         
-        cadena_resultado = " ".join(lista_nodos)
-        
+        self._infija(self.raiz, cadena_resultado)    
+        cadena_resultado = cadena_resultado + ")"
         return cadena_resultado
     
-    def _infija(self, nodo, lista_nodos):
+    def _infija(self, nodo: Nodo, cadena_resultado):
         if nodo is None:
             return
-        self._infija(nodo.izquierdo, lista_nodos)
-        lista_nodos.append(nodo.valor)
-        self._infija(nodo.derecho, lista_nodos)
+        
+        if nodo.es_hoja():
+            return nodo.valor
+        
+        return f"({self._infija(nodo.izquierdo)} {nodo.valor} {self._infija(nodo.derecho)})"
 
     # --- Ejercicio 4: metricas ----------------------------------------------
     def num_nodos(self):
