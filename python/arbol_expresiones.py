@@ -63,12 +63,45 @@ class ArbolExpresion:
 
     # --- Ejercicio 1: construir ---------------------------------------------
     def construir(self, postfija):
-        # Coste: O(?)
+        # Coste: O(n)
         # Devuelve la RAIZ (un Nodo) del arbol de la expresion postfija.
         # Si esta mal formada (faltan o sobran operandos, token que no es un
         # numero ni un operador, cadena vacia): raise ValueError("...")
-        # TODO: recorre postfija.split() con una pila (list) de NODOS.
-        raise NotImplementedError
+        lista_elementos_texto = postfija.split()
+        lista_elementos_nodos = []
+        if (postfija == ""):
+            raise ValueError("La cadena está vacía")
+        
+        
+        
+        for elemento in lista_elementos_texto:
+            if elemento.isdigit():
+                nodo_nuevo = Nodo(elemento, None, None)
+                lista_elementos_nodos.append(nodo_nuevo)
+            elif elemento in "+-*/":
+                if len(lista_elementos_nodos) > 2:
+                    raise ValueError("Hay números de más")
+                if (len(lista_elementos_nodos) < 2):
+                    raise ValueError("Hay operadores seguidos")
+                nodo_nuevo = Nodo(elemento, lista_elementos_nodos[0], lista_elementos_nodos[1])
+                lista_elementos_nodos = [nodo_nuevo]
+            else:
+                raise ValueError("Hay operandos que no son números ni operadores")
+        
+        if (len(lista_elementos_nodos) > 1):
+            raise("Sobran operandos")
+        return lista_elementos_nodos[0]
+        
+        
+    def _realiza_calculo(self, operando1, operando2, operador):
+        if operador == "+":
+            return float(operando1) + float(operando2)
+        elif operador == "-":
+            return float(operando1) - float(operando2)
+        elif operador == "*":
+            return float(operando1) * float(operando2)
+        elif operador == "/":
+            return float(operando1) / float(operando2)
 
     # --- Ejercicio 2: evaluar -----------------------------------------------
     def evaluar(self):
@@ -76,8 +109,20 @@ class ArbolExpresion:
         # "3 4 + 2 *" -> 14       "7 2 /" -> 3.5
         # Arbol vacio: raise ValueError("..."). La division por cero ya
         # lanza ZeroDivisionError por si sola.
-        # TODO
-        raise NotImplementedError
+        return self._evaluar(self.raiz)
+
+    def _evaluar(self, nodo: Nodo):
+        if (nodo is None):
+            raise ValueError("Árbol vacío")
+
+        if nodo.es_hoja():
+            return float(nodo.valor)
+        a = self._evaluar(nodo.izquierdo)
+        b = self._evaluar(nodo.derecho)
+        
+        resultado = self._realiza_calculo(a, b, nodo.valor)
+        
+        return resultado
 
     # --- Ejercicio 3: las tres notaciones -----------------------------------
     # Tokens separados por un espacio. Arbol vacio -> ""
