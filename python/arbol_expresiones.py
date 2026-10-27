@@ -95,13 +95,15 @@ class ArbolExpresion:
         
     def _realiza_calculo(self, operando1, operando2, operador):
         if operador == "+":
-            return float(operando1) + float(operando2)
+            return operando1 + operando2
         elif operador == "-":
-            return float(operando1) - float(operando2)
+            return operando1 - operando2
         elif operador == "*":
-            return float(operando1) * float(operando2)
+            return operando1 * operando2
         elif operador == "/":
-            return float(operando1) / float(operando2)
+            if (operando2 == 0):
+                raise ZeroDivisionError
+            return operando1 / operando2
 
     # --- Ejercicio 2: evaluar -----------------------------------------------
     def evaluar(self):
@@ -116,7 +118,7 @@ class ArbolExpresion:
             raise ValueError("Árbol vacío")
 
         if nodo.es_hoja():
-            return float(nodo.valor)
+            return int(nodo.valor)
         a = self._evaluar(nodo.izquierdo)
         b = self._evaluar(nodo.derecho)
         
@@ -127,20 +129,54 @@ class ArbolExpresion:
     # --- Ejercicio 3: las tres notaciones -----------------------------------
     # Tokens separados por un espacio. Arbol vacio -> ""
     def prefija(self):
-        # Coste: O(?)      (3 + 4) * 2  ->  "* + 3 4 2"
-        # TODO
-        raise NotImplementedError
+        # Coste: O(n)      (3 + 4) * 2  ->  "* + 3 4 2"
+        lista_nodos = []
+        self._prefija(self.raiz, lista_nodos)
+        
+        cadena_resultado = " ".join(lista_nodos)
+        
+        return cadena_resultado
+    
+    def _prefija(self, nodo: Nodo, lista_nodos):
+        if nodo is None:
+            return
+        lista_nodos.append(nodo.valor)
+        self._prefija(nodo.izquierdo, lista_nodos)
+        self._prefija(nodo.derecho, lista_nodos)
+        
 
     def postfija(self):
         # Coste: O(?)      (3 + 4) * 2  ->  "3 4 + 2 *"
-        # TODO
-        raise NotImplementedError
+        lista_nodos = []
+        self._postfija(self.raiz, lista_nodos)
+        
+        cadena_resultado = " ".join(lista_nodos)
+        
+        return cadena_resultado
+    
+    def _postfija(self, nodo, lista_nodos):
+        if nodo is None:
+            return
+        self._postfija(nodo.izquierdo, lista_nodos)
+        self._postfija(nodo.derecho, lista_nodos)
+        lista_nodos.append(nodo.valor)
 
     def infija(self):
-        # Coste: O(?)      (3 + 4) * 2  ->  "((3 + 4) * 2)"
+        # Coste: O(n)      (3 + 4) * 2  ->  "((3 + 4) * 2)"
         # Cada operacion entre parentesis; una hoja sola, sin ellos: "7"
-        # TODO
-        raise NotImplementedError
+        lista_nodos = []
+        self._infija(self.raiz, lista_nodos)
+        
+        cadena_resultado = " ".join(lista_nodos)
+        
+        return cadena_resultado
+    
+    def _infija(self, nodo, lista_nodos):
+        if nodo is None:
+            return
+        self._infija(nodo.izquierdo, lista_nodos)
+        lista_nodos.append(nodo.valor)
+        self._infija(nodo.derecho, lista_nodos)
 
     # --- Ejercicio 4: metricas ----------------------------------------------
     def num_nodos(self):
